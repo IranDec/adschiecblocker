@@ -47,10 +47,12 @@ class AdschiEcBlocker extends Module
 
     public function install()
     {
+        $default_whitelist = "google-analytics.com\nanalytics.google.com\ngoogletagmanager.com\ngoogle.com\ngstatic.com\ngoogleapis.com\nsearch.google.com\ngoogle.ir";
+
         if (!parent::install() ||
             !Configuration::updateValue('ADSCHI_BLOCK_EXTERNAL', 1) ||
             !Configuration::updateValue('ADSCHI_BLOCK_GOOGLE_FONTS', 1) ||
-            !Configuration::updateValue('ADSCHI_CUSTOM_WHITELIST', '') ||
+            !Configuration::updateValue('ADSCHI_CUSTOM_WHITELIST', $default_whitelist) ||
             !Configuration::updateValue('ADSCHI_CUSTOM_BLACKLIST', '')
         ) {
             return false;
@@ -183,10 +185,10 @@ class AdschiEcBlocker extends Module
     protected function getConfigFormValues()
     {
         return array(
-            'ADSCHI_BLOCK_EXTERNAL' => Configuration::get('ADSCHI_BLOCK_EXTERNAL', 1),
-            'ADSCHI_BLOCK_GOOGLE_FONTS' => Configuration::get('ADSCHI_BLOCK_GOOGLE_FONTS', 1),
-            'ADSCHI_CUSTOM_WHITELIST' => Configuration::get('ADSCHI_CUSTOM_WHITELIST', ''),
-            'ADSCHI_CUSTOM_BLACKLIST' => Configuration::get('ADSCHI_CUSTOM_BLACKLIST', ''),
+            'ADSCHI_BLOCK_EXTERNAL' => Configuration::get('ADSCHI_BLOCK_EXTERNAL'),
+            'ADSCHI_BLOCK_GOOGLE_FONTS' => Configuration::get('ADSCHI_BLOCK_GOOGLE_FONTS'),
+            'ADSCHI_CUSTOM_WHITELIST' => Configuration::get('ADSCHI_CUSTOM_WHITELIST'),
+            'ADSCHI_CUSTOM_BLACKLIST' => Configuration::get('ADSCHI_CUSTOM_BLACKLIST'),
         );
     }
 

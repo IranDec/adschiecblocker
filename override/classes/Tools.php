@@ -8,7 +8,7 @@ class Tools extends ToolsCore
     /**
      * Override file_get_contents to block external calls if configured.
      */
-    public static function file_get_contents($url, $use_include_path = false, $stream_context = null, $curl_timeout = 5)
+    public static function file_get_contents($url, $use_include_path = false, $stream_context = null, $curl_timeout = 5, $fallback = false)
     {
         if (Configuration::get('ADSCHI_BLOCK_EXTERNAL')) {
             // Check if it's a URL
@@ -23,6 +23,19 @@ class Tools extends ToolsCore
                     $whitelist[] = Tools::getHttpHost(false, false);
                     $whitelist[] = 'localhost';
                     $whitelist[] = '127.0.0.1';
+
+                    // Always allow SEO and Google tools (Analytics, Tag Manager, etc.)
+                    $seo_whitelist = array(
+                        'google-analytics.com',
+                        'analytics.google.com',
+                        'googletagmanager.com',
+                        'google.com',
+                        'gstatic.com',
+                        'googleapis.com',
+                        'search.google.com',
+                        'google.ir'
+                    );
+                    $whitelist = array_merge($whitelist, $seo_whitelist);
 
                     $is_whitelisted = false;
                     foreach ($whitelist as $allowed_host) {
@@ -52,7 +65,7 @@ class Tools extends ToolsCore
             }
         }
 
-        return parent::file_get_contents($url, $use_include_path, $stream_context, $curl_timeout);
+        return parent::file_get_contents($url, $use_include_path, $stream_context, $curl_timeout, $fallback);
     }
 
     /**
