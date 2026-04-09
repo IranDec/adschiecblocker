@@ -1,5 +1,31 @@
 # Adschi External Connections Blocker (AdschiEcBlocker)
 
+A PrestaShop module to block external HTTP requests and remove Google Fonts to improve website speed, especially for servers located in restricted networks (such as intranets in Iran).
+
+## Features
+- Blocks unnecessary external requests (by overriding `file_get_contents`).
+- Removes Google Fonts from the Front-end and Back-end to improve loading times.
+- Whitelist support: By default, essential SEO and Google tools (like Google Analytics, Google Tag Manager, etc.) bypass the blocker.
+- Blacklist support: Force block specific domains.
+- Fully compatible with PrestaShop 1.7 and above.
+
+## Installation
+1. Zip the module folder.
+2. Go to your PrestaShop admin panel.
+3. Navigate to **Modules > Module Manager** and click on **Upload a module**.
+4. Upload the zip file and wait for the installation to finish.
+
+## Configuration
+After installation, you can go to the module configuration page to manage:
+- Enable/Disable blocking of external requests.
+- Enable/Disable removing Google Fonts.
+- Add custom domains to the Whitelist (one domain per line).
+- Add custom domains to the Blacklist.
+
+---
+
+# ماژول AdschiEcBlocker
+
 ماژول پرستاشاپ برای مسدودسازی درخواست‌های خارجی و حذف فونت‌های گوگل جهت افزایش سرعت سایت، به‌ویژه برای سرورهایی که در شبکه‌های محدود و اینترانت (مانند ایران) قرار دارند.
 
 ## ویژگی‌ها (Features)
@@ -24,5 +50,5 @@
 
 ---
 
-**توسعه‌دهنده (Author):** Mohammad Babaei
-**وب‌سایت:** [adschi.com](https://adschi.com)
+**Author / توسعه‌دهنده:** Mohammad Babaei
+**Website / وب‌سایت:** [adschi.com](https://adschi.com)
