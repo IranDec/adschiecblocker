@@ -104,7 +104,11 @@ class Tools extends ToolsCore
             }
         }
 
-        return parent::file_get_contents($url, $use_include_path, $stream_context, $curl_timeout, $fallback);
+        if (version_compare(_PS_VERSION_, '1.7', '<')) {
+            return parent::file_get_contents($url, $use_include_path, $stream_context, $curl_timeout);
+        } else {
+            return parent::file_get_contents($url, $use_include_path, $stream_context, $curl_timeout, $fallback);
+        }
     }
 
     /**
