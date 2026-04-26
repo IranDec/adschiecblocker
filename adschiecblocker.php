@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.1.1';
+        $this->version = '1.2.0';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -43,11 +43,15 @@ class AdschiEcBlocker extends Module
 
         $this->displayName = $this->l('Adschi External Connections Blocker');
         $this->description = $this->l('Blocks external HTTP requests and Google Fonts to improve website speed for servers in restricted networks (like Iran).');
-        $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
     public function install()
     {
+        if (Shop::isFeatureActive()) {
+            Shop::setContext(Shop::CONTEXT_ALL);
+        }
+
         $default_whitelist = "google-analytics.com\nanalytics.google.com\ngoogletagmanager.com\ngoogle.com\ngstatic.com\ngoogleapis.com\nsearch.google.com\ngoogle.ir";
 
         if (!parent::install() ||
@@ -74,21 +78,21 @@ class AdschiEcBlocker extends Module
 
     public function uninstall()
     {
-        if (!parent::uninstall() ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_EXTERNAL') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_GOOGLE_FONTS') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_GOOGLE_ANALYTICS') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_TAG_MANAGER') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_FONT_AWESOME') ||
-            !Configuration::deleteByName('ADSCHI_LOCAL_FONT_AWESOME') ||
-            !Configuration::deleteByName('ADSCHI_LOCAL_FONT_AWESOME_URL') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_PRESTASHOP_API') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_ALL_EXTERNAL') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_UPDATES') ||
-            !Configuration::deleteByName('ADSCHI_BLOCK_THEME_LICENSE') ||
-            !Configuration::deleteByName('ADSCHI_CUSTOM_WHITELIST') ||
-            !Configuration::deleteByName('ADSCHI_CUSTOM_BLACKLIST')
-        ) {
+        Configuration::deleteByName('ADSCHI_BLOCK_EXTERNAL');
+        Configuration::deleteByName('ADSCHI_BLOCK_GOOGLE_FONTS');
+        Configuration::deleteByName('ADSCHI_BLOCK_GOOGLE_ANALYTICS');
+        Configuration::deleteByName('ADSCHI_BLOCK_TAG_MANAGER');
+        Configuration::deleteByName('ADSCHI_BLOCK_FONT_AWESOME');
+        Configuration::deleteByName('ADSCHI_LOCAL_FONT_AWESOME');
+        Configuration::deleteByName('ADSCHI_LOCAL_FONT_AWESOME_URL');
+        Configuration::deleteByName('ADSCHI_BLOCK_PRESTASHOP_API');
+        Configuration::deleteByName('ADSCHI_BLOCK_ALL_EXTERNAL');
+        Configuration::deleteByName('ADSCHI_BLOCK_UPDATES');
+        Configuration::deleteByName('ADSCHI_BLOCK_THEME_LICENSE');
+        Configuration::deleteByName('ADSCHI_CUSTOM_WHITELIST');
+        Configuration::deleteByName('ADSCHI_CUSTOM_BLACKLIST');
+
+        if (!parent::uninstall()) {
             return false;
         }
 
@@ -97,6 +101,11 @@ class AdschiEcBlocker extends Module
 
     public function hookActionDispatcher($params)
     {
+        // Skip output buffering for AJAX requests to avoid corrupting JSON responses
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            return;
+        }
+
         $blockFonts = Configuration::get('ADSCHI_BLOCK_GOOGLE_FONTS');
         $blockGA = Configuration::get('ADSCHI_BLOCK_GOOGLE_ANALYTICS');
         $blockGTM = Configuration::get('ADSCHI_BLOCK_TAG_MANAGER');
