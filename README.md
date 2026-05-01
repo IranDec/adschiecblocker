@@ -53,10 +53,17 @@ After installation, you can go to the module configuration page to manage:
 **Author / توسعه‌دهنده:** Mohammad Babaei
 **Website / وب‌سایت:** [adschi.com](https://adschi.com)
 ## Changelog
+### v1.2.2
+- Fixed Dashboard timeout issues by preventing problematic modules (like \`gamification\` and \`ps_mbo\`) from making external API calls when PrestaShop API blocking is enabled.
+
+---
 ### v1.2.1
 - Added `module_key` to bypass "untrusted module" warning during installation on PrestaShop 1.7.
 
 ---
 ## لیست تغییرات
+### نسخه 1.2.2
+- رفع مشکل تایم‌اوت و باز نشدن صفحه پیشخوان (Dashboard) با جلوگیری از اجرای ماژول‌های دردسرساز (مانند \`gamification\` و \`ps_mbo\`) هنگام فعال بودن مسدودسازی API پرستاشاپ.
+
 ### نسخه 1.2.1
 - اضافه شدن `module_key` برای رفع خطای "ماژول تایید نشده" هنگام نصب در پرستاشاپ 1.7.
