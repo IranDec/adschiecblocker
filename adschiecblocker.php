@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.0';
+        $this->version = '1.2.1';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -44,6 +44,7 @@ class AdschiEcBlocker extends Module
         $this->displayName = $this->l('Adschi External Connections Blocker');
         $this->description = $this->l('Blocks external HTTP requests and Google Fonts to improve website speed for servers in restricted networks (like Iran).');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->module_key = '38af975b974e1a1a0497591585fe2bbe';
     }
 
     public function install()
