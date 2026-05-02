@@ -56,6 +56,7 @@ After installation, you can go to the module configuration page to manage:
 ### v1.2.3
 - Improved `check_version.php` block to filter the iframe from the Dashboard HTML output.
 - Improved Font Awesome regex block to support modern Kit JS scripts and CDN links ending in `all.min.css`.
+- Fixed local Font Awesome compatibility to prevent blocking self-hosted files.
 
 ---
 ### v1.2.2
@@ -70,6 +71,7 @@ After installation, you can go to the module configuration page to manage:
 ### نسخه 1.2.3
 - بهبود مسدودسازی درخواست `check_version.php` در پیشخوان با حذف iframe مربوطه از کدهای HTML.
 - بهبود مسدودسازی فونت آوسام (Font Awesome) جهت پشتیبانی از اسکریپت‌های Kit و لینک‌های CDN جدید.
+- رفع تداخل مسدودسازی فونت آوسام با فایل‌های محلی (Local) و جلوگیری از مسدود شدن فونت‌های خود سایت.
 
 ### نسخه 1.2.2
 - رفع مشکل تایم‌اوت و باز نشدن صفحه پیشخوان (Dashboard) با جلوگیری از اجرای ماژول‌های دردسرساز (مانند \`gamification\` و \`ps_mbo\`) هنگام فعال بودن مسدودسازی API پرستاشاپ.

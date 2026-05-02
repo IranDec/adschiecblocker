@@ -177,16 +177,18 @@ class AdschiEcBlocker extends Module
         }
 
         if ($localFA && !empty($localFAUrl)) {
-            // Replace external Font Awesome with local URL
-            $html = preg_replace('/<link[^>]*href=["\'][^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
-            $html = preg_replace('/@import url\(["\']?[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
+            // Replace external Font Awesome with local URL (only if they are external, e.g. contain // or http and not the local host)
+            $host = Tools::getHttpHost(false, false);
+            $html = preg_replace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
+            $html = preg_replace('/@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
             // Also remove Kit JS scripts if replacing with local CSS
-            $html = preg_replace('/<script[^>]*src=["\'][^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
+            $html = preg_replace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         } elseif ($blockFA) {
-            // Completely remove Font Awesome
-            $html = preg_replace('/<link[^>]*href=["\'][^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
-            $html = preg_replace('/<script[^>]*src=["\'][^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
+            // Completely remove external Font Awesome
+            $host = Tools::getHttpHost(false, false);
+            $html = preg_replace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
+            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
+            $html = preg_replace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         }
 
         return $html;
