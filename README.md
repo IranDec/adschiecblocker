@@ -53,6 +53,11 @@ After installation, you can go to the module configuration page to manage:
 **Author / توسعه‌دهنده:** Mohammad Babaei
 **Website / وب‌سایت:** [adschi.com](https://adschi.com)
 ## Changelog
+### v1.2.3
+- Improved `check_version.php` block to filter the iframe from the Dashboard HTML output.
+- Improved Font Awesome regex block to support modern Kit JS scripts and CDN links ending in `all.min.css`.
+
+---
 ### v1.2.2
 - Fixed Dashboard timeout issues by preventing problematic modules (like \`gamification\` and \`ps_mbo\`) from making external API calls when PrestaShop API blocking is enabled.
 
@@ -62,6 +67,10 @@ After installation, you can go to the module configuration page to manage:
 
 ---
 ## لیست تغییرات
+### نسخه 1.2.3
+- بهبود مسدودسازی درخواست `check_version.php` در پیشخوان با حذف iframe مربوطه از کدهای HTML.
+- بهبود مسدودسازی فونت آوسام (Font Awesome) جهت پشتیبانی از اسکریپت‌های Kit و لینک‌های CDN جدید.
+
 ### نسخه 1.2.2
 - رفع مشکل تایم‌اوت و باز نشدن صفحه پیشخوان (Dashboard) با جلوگیری از اجرای ماژول‌های دردسرساز (مانند \`gamification\` و \`ps_mbo\`) هنگام فعال بودن مسدودسازی API پرستاشاپ.
 

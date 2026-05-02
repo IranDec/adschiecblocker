@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.2';
+        $this->version = '1.2.3';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -130,8 +130,10 @@ class AdschiEcBlocker extends Module
         $blockGTM = Configuration::get('ADSCHI_BLOCK_TAG_MANAGER');
         $blockFA = Configuration::get('ADSCHI_BLOCK_FONT_AWESOME');
         $localFA = Configuration::get('ADSCHI_LOCAL_FONT_AWESOME');
+        $blockUpdates = Configuration::get('ADSCHI_BLOCK_UPDATES');
+        $blockPsApi = Configuration::get('ADSCHI_BLOCK_PRESTASHOP_API');
 
-        if ($blockFonts || $blockGA || $blockGTM || $blockFA || $localFA) {
+        if ($blockFonts || $blockGA || $blockGTM || $blockFA || $localFA || $blockUpdates || $blockPsApi) {
             ob_start(array($this, 'filterOutput'));
         }
     }
@@ -144,6 +146,15 @@ class AdschiEcBlocker extends Module
         $blockFA = Configuration::get('ADSCHI_BLOCK_FONT_AWESOME');
         $localFA = Configuration::get('ADSCHI_LOCAL_FONT_AWESOME');
         $localFAUrl = Configuration::get('ADSCHI_LOCAL_FONT_AWESOME_URL');
+        $blockUpdates = Configuration::get('ADSCHI_BLOCK_UPDATES');
+        $blockPsApi = Configuration::get('ADSCHI_BLOCK_PRESTASHOP_API');
+
+        if ($blockUpdates || $blockPsApi) {
+            // Remove check_version iframe from the dashboard
+            $html = preg_replace('/<iframe[^>]*src=["\']([^"\']*api\.prestashop\.com\/version\/check_version\.php[^"\']*)["\'][^>]*>.*?<\/iframe>/is', '', $html);
+            // Optionally, we can also remove the entire section #dash_version
+            $html = preg_replace('/<section[^>]*id=["\']dash_version["\'][^>]*>.*?<\/section>/is', '', $html);
+        }
 
         if ($blockFonts) {
             // Remove google fonts links
@@ -167,12 +178,15 @@ class AdschiEcBlocker extends Module
 
         if ($localFA && !empty($localFAUrl)) {
             // Replace external Font Awesome with local URL
-            $html = preg_replace('/<link[^>]*href=["\'][^"\']*font-awesome(\.min)?\.css[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
-            $html = preg_replace('/@import url\(["\']?[^"\']*font-awesome(\.min)?\.css[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
+            $html = preg_replace('/<link[^>]*href=["\'][^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
+            $html = preg_replace('/@import url\(["\']?[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
+            // Also remove Kit JS scripts if replacing with local CSS
+            $html = preg_replace('/<script[^>]*src=["\'][^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         } elseif ($blockFA) {
             // Completely remove Font Awesome
-            $html = preg_replace('/<link[^>]*href=["\'][^"\']*font-awesome(\.min)?\.css[^"\']*["\'][^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?[^"\']*font-awesome(\.min)?\.css[^"\']*["\']?\).*?<\/style>/is', '', $html);
+            $html = preg_replace('/<link[^>]*href=["\'][^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
+            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
+            $html = preg_replace('/<script[^>]*src=["\'][^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         }
 
         return $html;
