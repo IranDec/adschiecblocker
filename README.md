@@ -53,7 +53,7 @@ After installation, you can go to the module configuration page to manage:
 **Author / توسعه‌دهنده:** Mohammad Babaei
 **Website / وب‌سایت:** [adschi.com](https://adschi.com)
 ## Changelog
-### v1.2.3
+### v1.2.4
 - Improved `check_version.php` block to filter the iframe from the Dashboard HTML output.
 - Improved Font Awesome regex block to support modern Kit JS scripts and CDN links ending in `all.min.css`.
 - Fixed local Font Awesome compatibility to prevent blocking self-hosted files.
@@ -68,7 +68,7 @@ After installation, you can go to the module configuration page to manage:
 
 ---
 ## لیست تغییرات
-### نسخه 1.2.3
+### نسخه 1.2.4
 - بهبود مسدودسازی درخواست `check_version.php` در پیشخوان با حذف iframe مربوطه از کدهای HTML.
 - بهبود مسدودسازی فونت آوسام (Font Awesome) جهت پشتیبانی از اسکریپت‌های Kit و لینک‌های CDN جدید.
 - رفع تداخل مسدودسازی فونت آوسام با فایل‌های محلی (Local) و جلوگیری از مسدود شدن فونت‌های خود سایت.
