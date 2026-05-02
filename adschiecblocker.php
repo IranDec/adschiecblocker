@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.3';
+        $this->version = '1.2.4';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
