@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.1';
+        $this->version = '1.2.2';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -102,6 +102,24 @@ class AdschiEcBlocker extends Module
 
     public function hookActionDispatcher($params)
     {
+        // Fix dashboard timeout: disable specific problematic modules dynamically if blocked
+        if (Configuration::get('ADSCHI_BLOCK_PRESTASHOP_API')) {
+            if (isset($params['controller_type']) && $params['controller_type'] == Dispatcher::FC_ADMIN) {
+                if (isset($params['controller_class']) && (strpos($params['controller_class'], 'AdminDashboard') !== false || strpos($params['controller_class'], 'AdminLogin') !== false || strpos($params['controller_class'], 'AdminModules') !== false)) {
+                    // Disable gamification and ps_mbo in memory for this request
+                    $modulesToDisable = array('gamification', 'ps_mbo');
+                    foreach ($modulesToDisable as $modName) {
+                        if (Module::isInstalled($modName)) {
+                            $modInstance = Module::getInstanceByName($modName);
+                            if ($modInstance) {
+                                $modInstance->active = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Skip output buffering for AJAX requests to avoid corrupting JSON responses
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             return;
