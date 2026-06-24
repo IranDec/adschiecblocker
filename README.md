@@ -53,6 +53,11 @@ After installation, you can go to the module configuration page to manage:
 **Author / توسعه‌دهنده:** Mohammad Babaei
 **Website / وب‌سایت:** [adschi.com](https://adschi.com)
 ## Changelog
+### v1.2.5
+- Fixed an issue where the Employees permissions page would appear blank. Disabled modules causing timeout in \`AdminProfiles\`, \`AdminEmployees\`, and \`AdminAccess\`.
+- Refactored regex replacements with `preg_replace_callback` to fix catastrophic backtracking issues and ensure HTML output isn't randomly blanked on large pages.
+
+---
 ### v1.2.4
 - Improved `check_version.php` block to filter the iframe from the Dashboard HTML output.
 - Improved Font Awesome regex block to support modern Kit JS scripts and CDN links ending in `all.min.css`.
@@ -68,6 +73,10 @@ After installation, you can go to the module configuration page to manage:
 
 ---
 ## لیست تغییرات
+### نسخه 1.2.5
+- رفع مشکل سفید شدن صفحه در قسمت دسترسی‌های کارمندان (Permissions) با غیرفعال کردن موقت ماژول‌های مشکل‌ساز در صفحات \`AdminProfiles\`، \`AdminEmployees\` و \`AdminAccess\`.
+- بازنویسی توابع جایگزینی عبارات باقاعده (Regex) با `preg_replace_callback` جهت جلوگیری از خطای Catastrophic Backtracking که باعث سفید شدن صفحات طولانی می‌شد.
+
 ### نسخه 1.2.4
 - بهبود مسدودسازی درخواست `check_version.php` در پیشخوان با حذف iframe مربوطه از کدهای HTML.
 - بهبود مسدودسازی فونت آوسام (Font Awesome) جهت پشتیبانی از اسکریپت‌های Kit و لینک‌های CDN جدید.

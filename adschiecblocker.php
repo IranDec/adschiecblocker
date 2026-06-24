@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.4';
+        $this->version = '1.2.5';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -105,7 +105,7 @@ class AdschiEcBlocker extends Module
         // Fix dashboard timeout: disable specific problematic modules dynamically if blocked
         if (Configuration::get('ADSCHI_BLOCK_PRESTASHOP_API')) {
             if (isset($params['controller_type']) && $params['controller_type'] == Dispatcher::FC_ADMIN) {
-                if (isset($params['controller_class']) && (strpos($params['controller_class'], 'AdminDashboard') !== false || strpos($params['controller_class'], 'AdminLogin') !== false || strpos($params['controller_class'], 'AdminModules') !== false)) {
+                if (isset($params['controller_class']) && (strpos($params['controller_class'], 'AdminDashboard') !== false || strpos($params['controller_class'], 'AdminLogin') !== false || strpos($params['controller_class'], 'AdminModules') !== false || strpos($params['controller_class'], 'AdminProfiles') !== false || strpos($params['controller_class'], 'AdminEmployees') !== false || strpos($params['controller_class'], 'AdminAccess') !== false)) {
                     // Disable gamification and ps_mbo in memory for this request
                     $modulesToDisable = array('gamification', 'ps_mbo');
                     foreach ($modulesToDisable as $modName) {
@@ -151,28 +151,28 @@ class AdschiEcBlocker extends Module
 
         if ($blockUpdates || $blockPsApi) {
             // Remove check_version iframe from the dashboard
-            $html = preg_replace('/<iframe[^>]*src=["\']([^"\']*api\.prestashop\.com\/version\/check_version\.php[^"\']*)["\'][^>]*>.*?<\/iframe>/is', '', $html);
+            $html = preg_replace_callback('/<iframe[^>]*>.*?<\/iframe>/is', function($m) { if (stripos($m[0], 'api.prestashop.com/version/check_version.php') !== false) { return ''; } return $m[0]; }, $html);
             // Optionally, we can also remove the entire section #dash_version
-            $html = preg_replace('/<section[^>]*id=["\']dash_version["\'][^>]*>.*?<\/section>/is', '', $html);
+            $html = preg_replace_callback('/<section[^>]*>.*?<\/section>/is', function($m) { if (preg_match('/id=["\']dash_version["\']/is', $m[0])) { return ''; } return $m[0]; }, $html);
         }
 
         if ($blockFonts) {
             // Remove google fonts links
             $html = preg_replace('/<link[^>]*href=["\'](https?:)?\/\/fonts\.(googleapis|gstatic)\.com[^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?(https?:)?\/\/fonts\.googleapis\.com.*?<\/style>/is', '', $html);
+            $html = preg_replace_callback('/<style[^>]*>.*?<\/style>/is', function($m) { if (stripos($m[0], 'fonts.googleapis.com') !== false) { return ''; } return $m[0]; }, $html);
         }
 
         if ($blockGA) {
             // Remove Google Analytics scripts
             $html = preg_replace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?google-analytics\.com\/analytics\.js["\'][^>]*>.*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?gtag\([\'"]config[\'"].*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?(www\.)?google-analytics\.com.*?<\/script>/is', '', $html);
+            $html = preg_replace_callback('/<script[^>]*>.*?<\/script>/is', function($m) { if (preg_match('/gtag\([\'"]config[\'"]/is', $m[0])) { return ''; } return $m[0]; }, $html);
+            $html = preg_replace_callback('/<script[^>]*>.*?<\/script>/is', function($m) { if (preg_match('/(www\.)?google-analytics\.com/is', $m[0])) { return ''; } return $m[0]; }, $html);
         }
 
         if ($blockGTM) {
             // Remove Google Tag Manager scripts and iframes
             $html = preg_replace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/gtm\.js[^>]*>.*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?(www\.)?googletagmanager\.com.*?<\/script>/is', '', $html);
+            $html = preg_replace_callback('/<script[^>]*>.*?<\/script>/is', function($m) { if (preg_match('/(www\.)?googletagmanager\.com/is', $m[0])) { return ''; } return $m[0]; }, $html);
             $html = preg_replace('/<noscript><iframe[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/ns\.html[^>]*>.*?<\/iframe><\/noscript>/is', '', $html);
         }
 
@@ -187,7 +187,7 @@ class AdschiEcBlocker extends Module
             // Completely remove external Font Awesome
             $host = Tools::getHttpHost(false, false);
             $html = preg_replace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
+            $html = preg_replace_callback('/<style[^>]*>.*?<\/style>/is', function($m) use ($host) { if (preg_match('/@import url\([\'"]?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^\'"]*(font-awesome|fontawesome|fa-all)[^\'"]*[\'"]?\)/is', $m[0])) { return ''; } return $m[0]; }, $html);
             $html = preg_replace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         }
 
