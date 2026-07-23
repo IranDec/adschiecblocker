@@ -33,7 +33,7 @@ class AdschiEcBlocker extends Module
     {
         $this->name = 'adschiecblocker';
         $this->tab = 'administration';
-        $this->version = '1.2.4';
+        $this->version = '1.2.5';
         $this->author = 'Mohammad Babaei (adschi.com)';
         $this->author_uri = 'https://adschi.com';
         $this->need_instance = 0;
@@ -138,8 +138,28 @@ class AdschiEcBlocker extends Module
         }
     }
 
+
+    /**
+     * Safely executes preg_replace. If PCRE limit is reached or an error occurs,
+     * it returns the original subject string to prevent white screens.
+     */
+    private function safeReplace($pattern, $replacement, $subject)
+    {
+        $result = preg_replace($pattern, $replacement, $subject);
+        if ($result === null) {
+            return $subject;
+        }
+        return $result;
+    }
+
     public function filterOutput($html)
     {
+        // Skip JSON or non-HTML responses to avoid corrupting data or regex overhead on large payloads
+        $trimmedHtml = trim($html);
+        if (strpos($trimmedHtml, '{') === 0 || strpos($trimmedHtml, '[') === 0) {
+            return $html;
+        }
+
         $blockFonts = Configuration::get('ADSCHI_BLOCK_GOOGLE_FONTS');
         $blockGA = Configuration::get('ADSCHI_BLOCK_GOOGLE_ANALYTICS');
         $blockGTM = Configuration::get('ADSCHI_BLOCK_TAG_MANAGER');
@@ -151,44 +171,44 @@ class AdschiEcBlocker extends Module
 
         if ($blockUpdates || $blockPsApi) {
             // Remove check_version iframe from the dashboard
-            $html = preg_replace('/<iframe[^>]*src=["\']([^"\']*api\.prestashop\.com\/version\/check_version\.php[^"\']*)["\'][^>]*>.*?<\/iframe>/is', '', $html);
+            $html = $this->safeReplace('/<iframe[^>]*src=["\']([^"\']*api\.prestashop\.com\/version\/check_version\.php[^"\']*)["\'][^>]*>.*?<\/iframe>/is', '', $html);
             // Optionally, we can also remove the entire section #dash_version
-            $html = preg_replace('/<section[^>]*id=["\']dash_version["\'][^>]*>.*?<\/section>/is', '', $html);
+            $html = $this->safeReplace('/<section[^>]*id=["\']dash_version["\'][^>]*>.*?<\/section>/is', '', $html);
         }
 
         if ($blockFonts) {
             // Remove google fonts links
-            $html = preg_replace('/<link[^>]*href=["\'](https?:)?\/\/fonts\.(googleapis|gstatic)\.com[^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?(https?:)?\/\/fonts\.googleapis\.com.*?<\/style>/is', '', $html);
+            $html = $this->safeReplace('/<link[^>]*href=["\'](https?:)?\/\/fonts\.(googleapis|gstatic)\.com[^>]*>/i', '', $html);
+            $html = $this->safeReplace('/<style[^>]*>.*?@import url\(["\']?(https?:)?\/\/fonts\.googleapis\.com.*?<\/style>/is', '', $html);
         }
 
         if ($blockGA) {
             // Remove Google Analytics scripts
-            $html = preg_replace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?google-analytics\.com\/analytics\.js["\'][^>]*>.*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?gtag\([\'"]config[\'"].*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?(www\.)?google-analytics\.com.*?<\/script>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?google-analytics\.com\/analytics\.js["\'][^>]*>.*?<\/script>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*>.*?gtag\([\'"]config[\'"].*?<\/script>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*>.*?(www\.)?google-analytics\.com.*?<\/script>/is', '', $html);
         }
 
         if ($blockGTM) {
             // Remove Google Tag Manager scripts and iframes
-            $html = preg_replace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/gtm\.js[^>]*>.*?<\/script>/is', '', $html);
-            $html = preg_replace('/<script[^>]*>.*?(www\.)?googletagmanager\.com.*?<\/script>/is', '', $html);
-            $html = preg_replace('/<noscript><iframe[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/ns\.html[^>]*>.*?<\/iframe><\/noscript>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/gtm\.js[^>]*>.*?<\/script>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*>.*?(www\.)?googletagmanager\.com.*?<\/script>/is', '', $html);
+            $html = $this->safeReplace('/<noscript><iframe[^>]*src=["\'](https?:)?\/\/(www\.)?googletagmanager\.com\/ns\.html[^>]*>.*?<\/iframe><\/noscript>/is', '', $html);
         }
 
         if ($localFA && !empty($localFAUrl)) {
             // Replace external Font Awesome with local URL (only if they are external, e.g. contain // or http and not the local host)
             $host = Tools::getHttpHost(false, false);
-            $html = preg_replace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
-            $html = preg_replace('/@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
+            $html = $this->safeReplace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '<link rel="stylesheet" href="' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '" />', $html);
+            $html = $this->safeReplace('/@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\);/i', '@import url("' . htmlspecialchars($localFAUrl, ENT_QUOTES, 'UTF-8') . '");', $html);
             // Also remove Kit JS scripts if replacing with local CSS
-            $html = preg_replace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
+            $html = $this->safeReplace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         } elseif ($blockFA) {
             // Completely remove external Font Awesome
             $host = Tools::getHttpHost(false, false);
-            $html = preg_replace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
-            $html = preg_replace('/<style[^>]*>.*?@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
-            $html = preg_replace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
+            $html = $this->safeReplace('/<link[^>]*href=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\'][^>]*>/i', '', $html);
+            $html = $this->safeReplace('/<style[^>]*>.*?@import url\(["\']?(?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome|fa-all)[^"\']*["\']?\).*?<\/style>/is', '', $html);
+            $html = $this->safeReplace('/<script[^>]*src=["\'](?:https?:)?\/\/(?!' . preg_quote($host, '/') . ')[^"\']*(font-awesome|fontawesome)[^"\']*["\'][^>]*><\/script>/i', '', $html);
         }
 
         return $html;

@@ -53,6 +53,11 @@ After installation, you can go to the module configuration page to manage:
 **Author / توسعه‌دهنده:** Mohammad Babaei
 **Website / وب‌سایت:** [adschi.com](https://adschi.com)
 ## Changelog
+### v1.2.5
+- Fixed an issue causing a blank white screen on large pages (like permissions and stats) due to regex limits by implementing a safe replace method.
+- Skipped JSON content from output buffering to prevent data corruption on AJAX endpoints.
+
+---
 ### v1.2.4
 - Improved `check_version.php` block to filter the iframe from the Dashboard HTML output.
 - Improved Font Awesome regex block to support modern Kit JS scripts and CDN links ending in `all.min.css`.
@@ -68,6 +73,10 @@ After installation, you can go to the module configuration page to manage:
 
 ---
 ## لیست تغییرات
+### نسخه 1.2.5
+- رفع مشکل صفحه سفید در صفحات طولانی و حجیم (مانند آمار و دسترسی‌ها) به دلیل محدودیت‌های جایگزینی عبارات باقاعده (regex limits).
+- نادیده گرفتن کدهای JSON از فیلترهای بافر خروجی جهت جلوگیری از خراب شدن دیتا در درخواست‌های ایجکس.
+
 ### نسخه 1.2.4
 - بهبود مسدودسازی درخواست `check_version.php` در پیشخوان با حذف iframe مربوطه از کدهای HTML.
 - بهبود مسدودسازی فونت آوسام (Font Awesome) جهت پشتیبانی از اسکریپت‌های Kit و لینک‌های CDN جدید.
